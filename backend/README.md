@@ -1,6 +1,6 @@
 # AI-Powered Quiz API
 
-A comprehensive REST API for a quiz application built with Django, Django REST Framework, and PostgreSQL. Features user authentication, AI-powered quiz generation (Google Gemini), attempt management, and detailed analytics.
+A comprehensive REST API for a quiz application built with Django, Django REST Framework, and PostgreSQL. Features user authentication, AI-powered quiz generation (Groq LLaMA 3.3), attempt management, and detailed analytics.
 
 ---
 
@@ -39,7 +39,7 @@ cp .env.example .env
 | `DB_USER` | PostgreSQL username |
 | `DB_PASSWORD` | PostgreSQL password |
 | `DB_HOST` | Usually `localhost` |
-| `GEMINI_API_KEY` | Free key from https://aistudio.google.com/app/apikey |
+| `GROQ_API_KEY` | Free key from https://console.groq.com/keys |
 | `REDIS_URL` | Optional — remove from settings if not using Redis |
 
 ### Step 4 — Create PostgreSQL Database
@@ -113,7 +113,7 @@ QuizGenerationRequest
 
 ---
 
-##  API Endpoint Overview
+##  API Endpoint Overviews
 
 ### Auth (`/api/v1/auth/`)
 | Method | Endpoint | Description |
@@ -168,12 +168,12 @@ Tokens are obtained from `/api/v1/auth/login/` and refreshed via `/api/v1/auth/t
 
 ##  AI Integration
 
-**Provider:** Google Gemini 1.5 Flash (free tier)
+**Provider:** Groq LLaMA-3.3-70B-Versatile (free tier)
 
 **How it works:**
 1. User sends POST to `/api/v1/quizzes/generate/` with `topic`, `num_questions` (1–20), `difficulty`
 2. API creates a `QuizGenerationRequest` record
-3. A structured prompt is sent to Gemini API requesting a JSON array of questions
+3. A structured prompt is sent to Groq API requesting a JSON array of questions
 4. The response is parsed and validated (correct option count, format checks)
 5. A `Quiz` and its `Question`/`QuestionOption` records are created atomically
 6. The generation request is marked complete with a reference to the new quiz
@@ -219,6 +219,22 @@ Tokens are obtained from `/api/v1/auth/login/` and refreshed via `/api/v1/auth/t
 - Database indexes on frequent filter fields: `topic`, `difficulty`, `status`, `user+quiz`
 - `unique_together` on `UserAnswer(attempt, question)` prevents duplicate answers
 - Throttling: 100/day anonymous, 1000/day authenticated users
+
+---
+
+## Challenges Faced & Solutions
+
+1. **AI Output Hallucination & JSON Formatting**
+   - *Challenge*: The AI API sometimes returns extra markdown wrappers (like ` ```json `) or conversational text along with the requested JSON array, breaking `json.loads`.
+   - *Solution*: Implemented a resilient fallback parser in `ai_service.py` that strips markdown blocks and uses regex (`r'\[.*\]'`) to extract the core JSON array before parsing.
+
+2. **Atomic AI Quiz Generation**
+   - *Challenge*: Generating a quiz involves creating a `Quiz` record, multiple `Question` records, and numerous `QuestionOption` records. If any part fails, we risk orphaned data.
+   - *Solution*: Wrapped the entire Quiz, Question, and Option creation process inside a `transaction.atomic()` block in `GenerateQuizView` to ensure data integrity.
+
+3. **Complex Aggregations for Analytics**
+   - *Challenge*: The Leaderboard and Admin Dashboard require calculating averages, pass rates, and tracking historical stats across thousands of attempts without slowing down the API.
+   - *Solution*: Leveraged Django's advanced ORM capabilities (`annotate`, `aggregate`, `Count` with `filter=Q()`) to push computation to the PostgreSQL database level instead of doing it in Python memory.
 
 ---
 
