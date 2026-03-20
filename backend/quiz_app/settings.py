@@ -1,11 +1,6 @@
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
-import os
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
 
 
 
@@ -88,3 +83,10 @@ SPECTACULAR_SETTINGS = {
 
 GROQ_API_KEY = config('GROQ_API_KEY', default='')
 AI_REQUEST_TIMEOUT = 30
+
+
+import os
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    import dj_database_url
+    DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
