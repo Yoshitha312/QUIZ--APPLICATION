@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizAI — Smart Quiz Platform</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070711;
+      --surface: #0f0f1e;
+      --surface2: #161628;
+      --border: #252540;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --accent4: #f9ca24;
+      --text: #eeeeff;
+      --text2: #8888bb;
+      --easy: #43e97b;
+      --medium: #f9ca24;
+      --hard: #ff6584;
+      --r: 14px;
+      --rs: 8px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 15% 15%, rgba(108, 99, 255, .07) 0, transparent 55%), radial-gradient(ellipse at 85% 85%, rgba(255, 101, 132, .04) 0, transparent 55%);
+      pointer-events: none;
+      z-index: 0
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 58px;
+      background: rgba(7, 7, 17, .92);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.4rem;
+      z-index: 100
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      cursor: pointer;
+      flex-shrink: 0
+    }
+
+    .nav-links {
+      display: flex;
+      gap: .35rem;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .nb {
+      padding: .32rem .8rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      border-radius: var(--rs);
+      cursor: pointer;
+      font-size: .8rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: all .2s;
+      white-space: nowrap
+    }
+
+    .nb:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .nb.on {
+      background: rgba(108, 99, 255, .15);
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .nb.red {
+      background: rgba(255, 101, 132, .15);
+      border-color: var(--accent2);
+      color: var(--accent2)
+    }
+
+    #nav-user {
+      font-size: .77rem;
+      color: var(--text2);
+      padding: .28rem .65rem;
+      background: var(--surface2);
+      border-radius: var(--rs);
+      border: 1px solid var(--border)
+    }
+
+    /* ── PAGES ── */
+    .page {
+      display: none;
+      position: relative;
+      z-index: 1;
+      min-height: 100vh
+    }
+
+    .page.active {
+      display: block
+    }
+
+    #page-auth {
+      padding-top: 0
+    }
+
+    .page:not(#page-auth) {
+      padding-top: 58px
+    }
+
+    /* ── CONTAINER ── */
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1.8rem 1.4rem
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: .65rem 1.4rem;
+      border-radius: var(--r);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem
+    }
+
+    .btn-p {
+      background: linear-gradient(135deg, var(--accent), #8c86ff);
+      color: #fff;
+      box-shadow: 0 3px 12px rgba(108, 99, 255, .3)
+    }
+
+    .btn-p:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 99, 255, .4)
+    }
+
+    .btn-s {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border)
+    }
+
+    .btn-s:hover {
+      border-color: var(--accent);
+      color: var(--accent)
+    }
+
+    .btn-d {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: #fff
+    }
+
+    .btn-sm {
+      padding: .36rem .8rem;
+      font-size: .78rem;
+      border-radius: var(--rs)
+    }
+
+    .btn-w {
+      width: 100%;
+      justify-content: center
+    }
+
+    .btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none !important
+    }
+
+    /* ── AUTH ── */
+    .auth-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem
+    }
+
+    .auth-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 2.4rem;
+      width: 100%;
+      max-width: 420px
+    }
+
+    .auth-box h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: .3rem
+    }
+
+    .auth-box>p {
+      color: var(--text2);
+      margin-bottom: 1.4rem;
+      font-size: .88rem
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 1.4rem;
+      gap: 3px
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: .6rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      transition: all .2s;
+      position: relative;
+      z-index: 2
+    }
+
+    .auth-tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(108, 99, 255, .4)
+    }
+
+    /* ── FORM ── */
+    .fg {
+      margin-bottom: .95rem
+    }
+
+    .fg label {
+      display: block;
+      font-size: .8rem;
+      color: var(--text2);
+      margin-bottom: .38rem;
+      font-weight: 500
+    }
+
+    .fg input,
+    .fg select,
+    .fg textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      padding: .68rem .9rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s
+    }
+
+    .fg input:focus,
+    .fg select:focus,
+    .fg textarea:focus {
+      border-color: var(--accent)
+    }
+
+    .fg select option {
+      background: var(--surface2)
+    }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .8rem
+    }
+
+    /* ── ALERT ── */
+    .alert {
+      padding: .65rem .9rem;
+      border-radius: var(--rs);
+      font-size: .85rem;
+      margin-bottom: .85rem;
+      display: none
+    }
+
+    .alert.show {
+      display: block
+    }
+
+    .ae {
+      background: rgba(255, 101, 132, .1);
+      border: 1px solid rgba(255, 101, 132, .3);
+      color: var(--accent2)
+    }
+
+    .as {
+      background: rgba(67, 233, 123, .1);
+      border: 1px solid rgba(67, 233, 123, .3);
+      color: var(--easy)
+    }
+
+    .aw {
+      background: rgba(249, 202, 36, .1);
+      border: 1px solid rgba(249, 202, 36, .3);
+      color: var(--medium)
+    }
+
+    /* ── BADGE ── */
+    .bdg {
+      font-size: .67rem;
+      padding: .18rem .52rem;
+      border-radius: 100px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      white-space: nowrap
+    }
+
+    .be {
+      background: rgba(67, 233, 123, .15);
+      color: var(--easy)
+    }
+
+    .bm {
+      background: rgba(249, 202, 36, .15);
+      color: var(--medium)
+    }
+
+    .bh {
+      background: rgba(255, 101, 132, .15);
+      color: var(--hard)
+    }
+
+    .ba {
+      background: rgba(108, 99, 255, .15);
+      color: var(--accent)
+    }
+
+    .bc {
+      background: rgba(67, 233, 123, .1);
+      color: var(--accent3);
+      border: 1px solid rgba(67, 233, 123, .2)
+    }
+
+    /* ── SECTION HDR ── */
+    .shdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.3rem;
+      flex-wrap: wrap;
+      gap: .7rem
+    }
+
+    .shdr h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700
+    }
+
+    /* ── TABS ── */
+    .tbbar {
+      display: flex;
+      gap: .35rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 3px;
+      margin-bottom: 1.3rem;
+      flex-wrap: wrap;
+      width: fit-content;
+      max-width: 100%
+    }
+
+    .tb {
+      padding: .45rem .9rem;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      border-radius: var(--rs);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .8rem;
+      transition: all .2s;
+      white-space: nowrap
+    }
+
+    .tb.active {
+      background: var(--accent);
+      color: #fff
+    }
+
+    /* ── QUIZ GRID ── */
+    .qgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.1rem
+    }
+
+    .qcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.2rem;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .qcard::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0;
+      transition: opacity .2s
+    }
+
+    .qcard:hover {
+      border-color: rgba(108, 99, 255, .4);
+      transform: translateY(-2px)
+    }
+
+    .qcard:hover::after {
+      opacity: 1
+    }
+
+    .qch {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: .55rem;
+      gap: .5rem
+    }
+
+    .qch h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: .95rem;
+      font-weight: 700;
+      line-height: 1.3
+    }
+
+    .qbdgs {
+      display: flex;
+      gap: .3rem;
+      flex-wrap: wrap;
+      flex-shrink: 0
+    }
+
+    .qdesc {
+      color: var(--text2);
+      font-size: .8rem;
+      line-height: 1.5;
+      margin-bottom: .7rem
+    }
+
+    .qmeta {
+      display: flex;
+      gap: .7rem;
+      color: var(--text2);
+      font-size: .75rem;
+      flex-wrap: wrap
+    }
+
+    /* ── CATEGORIES ── */
+    .cgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: .9rem;
+      margin-bottom: 1.8rem
+    }
+
+    .ccard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.1rem;
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center
+    }
+
+    .ccard:hover {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, .05)
+    }
+
+    .ccard.active {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, .1)
+    }
+
+    .cicon {
+      font-size: 1.8rem;
+      margin-bottom: .45rem
+    }
+
+    .cname {
+      font-family: 'Syne', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      margin-bottom: .18rem
+    }
+
+    .ccount {
+      font-size: .74rem;
+      color: var(--text2)
+    }
+
+    /* ── MODAL ── */
+    .mover {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .75);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem
+    }
+
+    .mover.show {
+      display: flex
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 1.8rem;
+      width: 100%;
+      max-width: 490px;
+      animation: sup .3s ease;
+      max-height: 90vh;
+      overflow-y: auto
+    }
+
+    @keyframes sup {
+      from {
+        opacity: 0;
+        transform: translateY(18px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .mhdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.3rem
+    }
+
+    .mhdr h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700
+    }
+
+    .mclose {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--rs);
+      cursor: pointer;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .mclose:hover {
+      color: var(--text);
+      border-color: var(--accent)
+    }
+
+    /* ── TIMER BAR ── */
+    .tbar {
+      position: sticky;
+      top: 58px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: .65rem 1.4rem;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 1rem
+    }
+
+    .tdisp {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+      min-width: 75px;
+      flex-shrink: 0
+    }
+
+    .tdisp.warn {
+      color: var(--medium)
+    }
+
+    .tdisp.urg {
+      color: var(--accent2);
+      animation: blk .8s ease-in-out infinite
+    }
+
+    @keyframes blk {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+    }
+
+    .tprog {
+      flex: 1;
+      height: 5px;
+      background: var(--surface2);
+      border-radius: 100px;
+      overflow: hidden
+    }
+
+    .tfill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--easy), var(--accent));
+      border-radius: 100px;
+      transition: width 1s linear
+    }
+
+    .tfill.warn {
+      background: linear-gradient(90deg, var(--medium), var(--accent2))
+    }
+
+    .tfill.urg {
+      background: var(--accent2)
+    }
+
+    .tinfo {
+      text-align: right;
+      flex-shrink: 0;
+      font-size: .76rem;
+      color: var(--text2);
+      line-height: 1.5
+    }
+
+    /* ── QUIZ TAKE ── */
+    .qwrap {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 1.5rem 1.2rem
+    }
+
+    .qprog {
+      margin-bottom: 1.4rem
+    }
+
+    .qpinfo {
+      display: flex;
+      justify-content: space-between;
+      font-size: .8rem;
+      color: var(--text2);
+      margin-bottom: .45rem
+    }
+
+    .pbar {
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 100px;
+      overflow: hidden
+    }
+
+    .pfill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 100px;
+      transition: width .4s ease
+    }
+
+    .qbox {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.6rem;
+      margin-bottom: 1.1rem
+    }
+
+    .qmeta2 {
+      display: flex;
+      gap: .45rem;
+      align-items: center;
+      margin-bottom: .7rem;
+      flex-wrap: wrap
+    }
+
+    .qn {
+      font-size: .72rem;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    .qpts {
+      font-size: .72rem;
+      color: var(--text2);
+      background: var(--surface2);
+      padding: .13rem .46rem;
+      border-radius: 100px
+    }
+
+    .qtxt {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.08rem;
+      font-weight: 600;
+      line-height: 1.55;
+      margin-bottom: 1.2rem
+    }
+
+    .olist {
+      display: flex;
+      flex-direction: column;
+      gap: .55rem
+    }
+
+    .oi {
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: var(--rs);
+      padding: .85rem 1.05rem;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      font-size: .88rem;
+      user-select: none
+    }
+
+    .oi:hover {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, .05)
+    }
+
+    .oi.sel {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, .1);
+      color: var(--accent)
+    }
+
+    .oi.ok {
+      border-color: var(--easy);
+      background: rgba(67, 233, 123, .1);
+      color: var(--easy)
+    }
+
+    .oi.bad {
+      border-color: var(--accent2);
+      background: rgba(255, 101, 132, .1);
+      color: var(--accent2)
+    }
+
+    .oltr {
+      width: 25px;
+      height: 25px;
+      border-radius: 6px;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .73rem;
+      font-weight: 700;
+      flex-shrink: 0
+    }
+
+    .qact {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .8rem;
+      padding: .8rem 0
+    }
+
+    /* ── RESULTS ── */
+    .rwrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1.5rem 1.2rem
+    }
+
+    .rbanner {
+      text-align: center;
+      padding: 1.3rem;
+      border-radius: var(--r);
+      margin-bottom: 1.3rem
+    }
+
+    .rbanner.pass {
+      background: rgba(67, 233, 123, .1);
+      border: 1px solid rgba(67, 233, 123, .3)
+    }
+
+    .rbanner.fail {
+      background: rgba(255, 101, 132, .1);
+      border: 1px solid rgba(255, 101, 132, .3)
+    }
+
+    .rbanner.tout {
+      background: rgba(249, 202, 36, .1);
+      border: 1px solid rgba(249, 202, 36, .3)
+    }
+
+    .rbanner h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-bottom: .2rem
+    }
+
+    .rbanner.pass h2 {
+      color: var(--easy)
+    }
+
+    .rbanner.fail h2 {
+      color: var(--accent2)
+    }
+
+    .rbanner.tout h2 {
+      color: var(--medium)
+    }
+
+    .scirc {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.1rem;
+      position: relative
+    }
+
+    .scirc-in {
+      position: absolute;
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center
+    }
+
+    .spct {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 800;
+      line-height: 1
+    }
+
+    .spts {
+      font-size: .72rem;
+      color: var(--text2)
+    }
+
+    .rstats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .9rem;
+      margin-bottom: 1.3rem
+    }
+
+    .sbox {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: .95rem;
+      text-align: center
+    }
+
+    .sv {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: .18rem
+    }
+
+    .sl {
+      font-size: .73rem;
+      color: var(--text2)
+    }
+
+    .aitm {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1rem;
+      margin-bottom: .7rem
+    }
+
+    .aqtxt {
+      font-weight: 500;
+      margin-bottom: .55rem;
+      font-size: .88rem;
+      line-height: 1.45
+    }
+
+    .arow {
+      display: flex;
+      gap: .45rem;
+      align-items: center;
+      font-size: .8rem;
+      flex-wrap: wrap
+    }
+
+    .atag {
+      padding: .16rem .5rem;
+      border-radius: 5px;
+      font-size: .7rem;
+      font-weight: 700
+    }
+
+    .aok {
+      background: rgba(67, 233, 123, .15);
+      color: var(--easy)
+    }
+
+    .ano {
+      background: rgba(255, 101, 132, .15);
+      color: var(--accent2)
+    }
+
+    .aexp {
+      font-size: .78rem;
+      color: var(--text2);
+      margin-top: .45rem;
+      font-style: italic;
+      line-height: 1.4
+    }
+
+    /* ── DASHBOARD ── */
+    .dstats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: .85rem;
+      margin-bottom: 1.4rem
+    }
+
+    .dcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1rem
+    }
+
+    .dlbl {
+      font-size: .73rem;
+      color: var(--text2);
+      margin-bottom: .38rem
+    }
+
+    .dval {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 700
+    }
+
+    .dval.pu {
+      color: var(--accent)
+    }
+
+    .dval.gr {
+      color: var(--easy)
+    }
+
+    .dval.pk {
+      color: var(--accent2)
+    }
+
+    .dval.ye {
+      color: var(--medium)
+    }
+
+    /* ── TABLE ── */
+    .twrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px
+    }
+
+    th {
+      text-align: left;
+      font-size: .7rem;
+      color: var(--text2);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: .65rem .95rem;
+      border-bottom: 1px solid var(--border)
+    }
+
+    td {
+      padding: .8rem .95rem;
+      font-size: .83rem;
+      border-bottom: 1px solid rgba(37, 37, 64, .5)
+    }
+
+    tr:last-child td {
+      border-bottom: none
+    }
+
+    tr:hover td {
+      background: rgba(108, 99, 255, .03)
+    }
+
+    /* ── LEADERBOARD ── */
+    .lbr {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: .95rem
+    }
+
+    .gold {
+      color: #f9ca24
+    }
+
+    .silver {
+      color: #c0c0c0
+    }
+
+    .bronze {
+      color: #cd7f32
+    }
+
+    /* ── MY QUIZZES LIST ── */
+    .mqitem {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.05rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .9rem;
+      margin-bottom: .7rem;
+      cursor: pointer;
+      transition: all .2s;
+      flex-wrap: wrap
+    }
+
+    .mqitem:hover {
+      border-color: rgba(108, 99, 255, .4);
+      transform: translateX(3px)
+    }
+
+    .mqinfo {
+      flex: 1;
+      min-width: 180px
+    }
+
+    .mqtitle {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .92rem;
+      margin-bottom: .28rem
+    }
+
+    .mqmeta {
+      font-size: .75rem;
+      color: var(--text2);
+      display: flex;
+      gap: .55rem;
+      flex-wrap: wrap
+    }
+
+    .mqscore {
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .mqpct {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800
+    }
+
+    /* ── LOADING / EMPTY ── */
+    .ldwrap {
+      text-align: center;
+      padding: 2.5rem
+    }
+
+    .spin {
+      width: 38px;
+      height: 38px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spn .7s linear infinite;
+      margin: 0 auto .9rem
+    }
+
+    @keyframes spn {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .genld {
+      text-align: center;
+      padding: 2.2rem
+    }
+
+    .gicon {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: rgba(108, 99, 255, .1);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      margin: 0 auto 1.1rem;
+      animation: pls 1.5s ease-in-out infinite
+    }
+
+    @keyframes pls {
+
+      0%,
+      100% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.1)
+      }
+    }
+
+    .empty {
+      text-align: center;
+      padding: 2.8rem 1.4rem;
+      color: var(--text2)
+    }
+
+    .eico {
+      font-size: 2.8rem;
+      margin-bottom: .65rem
+    }
+
+    .empty h3 {
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      margin-bottom: .35rem
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 1.4rem;
+      right: 1.4rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: .75rem 1rem;
+      font-size: .85rem;
+      z-index: 999;
+      transform: translateY(70px);
+      opacity: 0;
+      transition: all .3s;
+      max-width: 290px
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    .toast.ts {
+      border-color: var(--easy);
+      color: var(--easy)
+    }
+
+    .toast.te {
+      border-color: var(--accent2);
+      color: var(--accent2)
+    }
+
+    .toast.tw {
+      border-color: var(--medium);
+      color: var(--medium)
+    }
+
+    /* ── SCORING INFO BOX ── */
+    .sinfo {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--rs);
+      padding: .75rem .9rem;
+      margin-bottom: .9rem;
+      font-size: .78rem;
+      color: var(--text2);
+      line-height: 1.7
+    }
+
+    .sinfo b {
+      color: var(--text)
+    }
+
+    @media(max-width:580px) {
+      .rstats {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .dstats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .nav-links {
+        gap: .2rem
+      }
+
+      .nb {
+        padding: .28rem .55rem;
+        font-size: .73rem
+      }
+
+      .row2 {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav id="nav" style="display:none">
+    <div class="nav-logo" onclick="go('home')">QuizAI ⚡</div>
+    <div class="nav-links">
+      <span id="nav-user"></span>
+      <button class="nb" id="nb-home" onclick="go('home')">🏠 Home</button>
+      <button class="nb" id="nb-myquizzes" onclick="go('myquizzes')">📋 My Quizzes</button>
+      <button class="nb" id="nb-leaderboard" onclick="go('leaderboard')">🏆 Board</button>
+      <button class="nb" id="nb-dashboard" onclick="go('dashboard')">📊 Stats</button>
+      <button class="nb red" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ══════════════════════════════════════════
+     AUTH PAGE
+══════════════════════════════════════════ -->
+  <div class="page active" id="page-auth">
+    <div class="auth-wrap">
+      <div class="auth-box">
+        <h2>QuizAI ⚡</h2>
+        <p>AI-powered smart quiz platform</p>
+
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+        </div>
+
+        <div id="alert-auth" class="alert"></div>
+
+        <!-- LOGIN -->
+        <div id="form-login">
+          <div class="fg"><label>Email</label><input type="email" id="li-email" placeholder="your@email.com"></div>
+          <div class="fg"><label>Password</label><input type="password" id="li-pass" placeholder="••••••••"
+              onkeydown="if(event.key==='Enter')login()"></div>
+          <button class="btn btn-p btn-w" onclick="login()"><span id="li-txt">Login</span></button>
+          <p style="text-align:center;margin-top:.9rem;font-size:.82rem;color:var(--text2)">No account? <span
+              style="color:var(--accent);cursor:pointer" onclick="switchTab('register')">Register here</span></p>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="form-register" style="display:none">
+          <div class="fg"><label>Username</label><input type="text" id="rg-user" placeholder="cooluser123"></div>
+          <div class="fg"><label>Email</label><input type="email" id="rg-email" placeholder="your@email.com"></div>
+          <div class="fg"><label>Password</label><input type="password" id="rg-pass" placeholder="Min 8 characters">
+          </div>
+          <div class="fg"><label>Confirm Password</label><input type="password" id="rg-pass2"
+              placeholder="Repeat password" onkeydown="if(event.key==='Enter')register()"></div>
+          <button class="btn btn-p btn-w" onclick="register()"><span id="rg-txt">Create Account</span></button>
+          <p style="text-align:center;margin-top:.9rem;font-size:.82rem;color:var(--text2)">Have account? <span
+              style="color:var(--accent);cursor:pointer" onclick="switchTab('login')">Login here</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     HOME PAGE
+══════════════════════════════════════════ -->
+  <div class="page" id="page-home">
+    <div class="wrap">
+      <!-- HERO -->
+      <div style="text-align:center;padding:1.8rem 0 2.2rem">
+        <div
+          style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);border-radius:100px;padding:.3rem .9rem;font-size:.72rem;color:var(--accent);margin-bottom:1.1rem;text-transform:uppercase;letter-spacing:.06em">
+          ⚡ Powered by Groq + LLaMA</div>
+        <h1
+          style="font-family:'Syne',sans-serif;font-size:clamp(1.9rem,5vw,3.2rem);font-weight:800;line-height:1.1;margin-bottom:.9rem">
+          Learn Smarter with<br><span
+            style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">AI-Powered
+            Quizzes</span></h1>
+        <p style="color:var(--text2);font-size:.95rem;max-width:440px;margin:0 auto 1.6rem;line-height:1.65">Generate
+          custom quizzes on any topic. Difficulty scoring. Timer challenges. Category leaderboards.</p>
+        <div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-p" onclick="openGen()">🤖 Generate AI Quiz</button>
+          <button class="btn btn-s"
+            onclick="document.getElementById('browse-sec').scrollIntoView({behavior:'smooth'})">📚 Browse All</button>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="shdr">
+        <h2>📂 Browse by Category</h2><button class="btn btn-s btn-sm" onclick="resetFilter()">Show All</button>
+      </div>
+      <div class="cgrid" id="cat-grid"></div>
+
+      <!-- QUIZ LIST -->
+      <div id="browse-sec">
+        <div class="shdr">
+          <h2 id="browse-title">All Quizzes</h2>
+          <button class="btn btn-p btn-sm" onclick="openGen()">+ Generate</button>
+        </div>
+        <div id="quiz-grid" class="qgrid">
+          <div class="ldwrap">
+            <div class="spin"></div>
+            <p style="color:var(--text2)">Loading...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     MY QUIZZES PAGE
+══════════════════════════════════════════ -->
+  <div class="page" id="page-myquizzes">
+    <div class="wrap">
+      <div class="shdr">
+        <h2>📋 My Quiz History</h2>
+        <button class="btn btn-p btn-sm" onclick="openGen()">+ New Quiz</button>
+      </div>
+      <p style="color:var(--text2);font-size:.86rem;margin-bottom:1.3rem">Only quizzes you've attempted appear here.
+        Click any to retake!</p>
+      <div id="mq-list">
+        <div class="ldwrap">
+          <div class="spin"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     QUIZ TAKING PAGE
+══════════════════════════════════════════ -->
+  <div class="page" id="page-quiz">
+    <!-- TIMER BAR -->
+    <div class="tbar">
+      <div>
+        <div style="font-size:.68rem;color:var(--text2);margin-bottom:.08rem" id="t-title">Quiz</div>
+        <div class="tdisp" id="t-disp">15:00</div>
+      </div>
+      <div class="tprog">
+        <div class="tfill" id="t-fill" style="width:100%"></div>
+      </div>
+      <div class="tinfo" id="t-info"></div>
+    </div>
+
+    <div class="qwrap">
+      <div class="qprog">
+        <div class="qpinfo">
+          <span id="q-prog-txt">Q 1/5</span>
+          <span id="q-topic" style="color:var(--accent);font-size:.78rem"></span>
+        </div>
+        <div class="pbar">
+          <div class="pfill" id="q-pfill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qmeta2">
+          <span class="qn" id="q-num">Question 1</span>
+          <span class="qpts" id="q-pts">1 pt</span>
+          <span class="bdg" id="q-diff"></span>
+        </div>
+        <div class="qtxt" id="q-txt">Loading...</div>
+        <div class="olist" id="q-opts"></div>
+      </div>
+
+      <div class="qact">
+        <button class="btn btn-s btn-sm" onclick="confirmExit()">✕ Exit</button>
+        <button class="btn btn-p" id="q-next" onclick="nextQ()" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     RESULTS PAGE
+══════════════════════════════════════════ -->
+  <div class="page" id="page-results">
+    <div class="rwrap">
+      <div id="res-banner" class="rbanner">
+        <h2 id="res-title">Done!</h2>
+        <p id="res-sub" style="color:var(--text2);font-size:.88rem"></p>
+      </div>
+
+      <div style="text-align:center;margin-bottom:1.3rem">
+        <div class="scirc" id="scirc">
+          <svg style="position:absolute;top:0;left:0;width:130px;height:130px;transform:rotate(-90deg)"
+            viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r="55" fill="none" stroke="var(--surface2)" stroke-width="7" />
+            <circle cx="65" cy="65" r="55" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round"
+              id="s-arc" stroke-dasharray="345" stroke-dashoffset="345" style="transition:stroke-dashoffset 1s ease" />
+          </svg>
+          <div class="scirc-in">
+            <span class="spct" id="s-pct">0%</span>
+            <span class="spts" id="s-pts">0 pts</span>
+          </div>
+        </div>
+        <div id="res-bdgs" style="display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:.45rem"></div>
+      </div>
+
+      <div class="rstats">
+        <div class="sbox">
+          <div class="sv gr" id="rs-ok">0</div>
+          <div class="sl">Correct</div>
+        </div>
+        <div class="sbox">
+          <div class="sv pk" id="rs-no">0</div>
+          <div class="sl">Wrong</div>
+        </div>
+        <div class="sbox">
+          <div class="sv pu" id="rs-time">—</div>
+          <div class="sl">Time</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.7rem;justify-content:center;margin-bottom:1.7rem;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="go('home')">🏠 Home</button>
+        <button class="btn btn-s" onclick="openGen()">🤖 New Quiz</button>
+        <button class="btn btn-s" onclick="go('leaderboard')">🏆 Leaderboard</button>
+        <button class="btn btn-s" onclick="go('dashboard')">📊 Dashboard</button>
+      </div>
+
+      <h3 style="font-family:'Syne',sans-serif;margin-bottom:.9rem">📝 Answer Review</h3>
+      <div id="res-answers"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     LEADERBOARD PAGE
+══════════════════════════════════════════ -->
+  <div class="page" id="page-leaderboard">
+    <div class="wrap">
+      <div class="shdr">
+        <h2>🏆 Leaderboard</h2>
+      </div>
+      <div class="tbbar" id="lb-tabs">
+        <button class="tb active" onclick="loadLB(null,this)">🌍 Overall</button>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Best Score</th>
+              <th>Avg Score</th>
+              <th>Quizzes</th>
+              <th>Passed</th>
+            </tr>
+          </thead>
+          <tbody id="lb-tbody">
+            <tr>
+              <td colspan="6" style="text-align:center;color:var(--text2);padding:2rem">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     DASHBOARD PAGE
+══════════════════════════════════════════ -->
+  <div class="page" id="page-dashboard">
+    <div class="wrap">
+      <div class="shdr">
+        <h2>📊 My Dashboard</h2>
+        <button class="btn btn-p btn-sm" onclick="openGen()">+ New Quiz</button>
+      </div>
+      <div class="dstats">
+        <div class="dcard">
+          <div class="dlbl">Total Attempts</div>
+          <div class="dval pu" id="ds-tot">—</div>
+        </div>
+        <div class="dcard">
+          <div class="dlbl">Completed</div>
+          <div class="dval" id="ds-com">—</div>
+        </div>
+        <div class="dcard">
+          <div class="dlbl">Passed</div>
+          <div class="dval gr" id="ds-pas">—</div>
+        </div>
+        <div class="dcard">
+          <div class="dlbl">Failed</div>
+          <div class="dval pk" id="ds-fai">—</div>
+        </div>
+        <div class="dcard">
+          <div class="dlbl">Avg Score</div>
+          <div class="dval pu" id="ds-avg">—</div>
+        </div>
+        <div class="dcard">
+          <div class="dlbl">Best Score</div>
+          <div class="dval ye" id="ds-bst">—</div>
+        </div>
+      </div>
+
+      <div class="shdr" style="margin-top:1.4rem">
+        <h2>📂 Category Performance</h2>
+      </div>
+      <div id="cat-breakdown"
+        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.85rem;margin-bottom:1.6rem">
+      </div>
+
+      <div class="shdr">
+        <h2>Recent Activity</h2>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Quiz</th>
+              <th>Category</th>
+              <th>Difficulty</th>
+              <th>Score</th>
+              <th>Result</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="dash-tbody">
+            <tr>
+              <td colspan="6" style="text-align:center;color:var(--text2);padding:2rem">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     GENERATE MODAL
+══════════════════════════════════════════ -->
+  <div class="mover" id="gen-modal">
+    <div class="modal">
+      <div class="mhdr">
+        <h3>🤖 Generate AI Quiz</h3>
+        <button class="mclose" onclick="closeGen()">✕</button>
+      </div>
+
+      <div id="gen-form">
+        <div class="fg">
+          <label>Topic <span style="color:var(--text2);font-size:.73rem">(educational topics only)</span></label>
+          <input type="text" id="gen-topic" placeholder="e.g. Python, World History, Computer Networks...">
+        </div>
+        <div class="row2">
+          <div class="fg">
+            <label>Questions</label>
+            <select id="gen-count">
+              <option value="3">3 Questions</option>
+              <option value="5" selected>5 Questions</option>
+              <option value="8">8 Questions</option>
+              <option value="10">10 Questions</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Difficulty</label>
+            <select id="gen-diff">
+              <option value="easy">🟢 Easy</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="hard">🔴 Hard</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Language</label>
+          <select id="gen-lang">
+            <option value="english">🇬🇧 English</option>
+            <option value="tamil">🇮🇳 Tamil</option>
+            <option value="hindi">🇮🇳 Hindi</option>
+            <option value="telugu">🇮🇳 Telugu</option>
+            <option value="kannada">🇮🇳 Kannada</option>
+            <option value="malayalam">🇮🇳 Malayalam</option>
+          </select>
+        </div>
+        <div class="sinfo">
+          <b>📊 Scoring:</b> Easy = 1pt/q &nbsp;|&nbsp; Medium = 2pts/q &nbsp;|&nbsp; Hard = 3pts/q<br>
+          <b>⏱️ Timer:</b> Easy = 10 min &nbsp;|&nbsp; Medium = 15 min &nbsp;|&nbsp; Hard = 20 min
+        </div>
+        <div id="alert-gen" class="alert"></div>
+        <div style="display:flex;gap:.75rem">
+          <button class="btn btn-s" style="flex:1" onclick="closeGen()">Cancel</button>
+          <button class="btn btn-p" style="flex:2" onclick="genQuiz()">
+            <span id="gen-txt">⚡ Generate Quiz</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="gen-loading" style="display:none">
+        <div class="genld">
+          <div class="gicon">🤖</div>
+          <h3 style="font-family:'Syne',sans-serif;margin-bottom:.4rem">Generating...</h3>
+          <p style="color:var(--text2);font-size:.85rem">AI is crafting your questions</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXIT CONFIRM MODAL -->
+  <div class="mover" id="exit-modal">
+    <div class="modal" style="max-width:340px">
+      <div class="mhdr">
+        <h3>⚠️ Exit Quiz?</h3>
+      </div>
+      <p style="color:var(--text2);margin-bottom:1.4rem;font-size:.88rem">Your progress will be lost.</p>
+      <div style="display:flex;gap:.75rem">
+        <button class="btn btn-s" style="flex:1" onclick="closeExit()">Keep Playing</button>
+        <button class="btn btn-d" style="flex:1" onclick="exitQuiz()">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ════════════════════════════════════════
+       CONSTANTS & STATE
+    ════════════════════════════════════════ */
+    const API = 'http://127.0.0.1:8000/api/v1';
+    let token = localStorage.getItem('qai_tok') || '';
+    let refreshTok = localStorage.getItem('qai_ref') || '';
+    let me = JSON.parse(localStorage.getItem('qai_me') || 'null');
+
+    // Quiz state
+    let cQuiz = null, cAttemptId = null, cQs = [], cIdx = 0;
+    let selOpt = null, timerInt = null, timerSec = 0, totalSec = 0;
+
+    // Maps
+    const CAT_ICON = { programming: '💻', computer_science: '🖥️', networking: '🌐', mathematics: '🔢', science: '🔬', geography: '🌍', history: '📜', general_knowledge: '💡', language: '📖', economics: '💰', other: '📁' };
+    const CAT_NAME = { programming: 'Programming', computer_science: 'Computer Science', networking: 'Networking', mathematics: 'Mathematics', science: 'Science', geography: 'Geography', history: 'History', general_knowledge: 'General Knowledge', language: 'Language', economics: 'Economics', other: 'Other' };
+
+    /* ════════════════════════════════════════
+       API HELPER
+    ════════════════════════════════════════ */
+    async function api(method, path, body = null, auth = true) {
+      const h = { 'Content-Type': 'application/json' };
+      if (auth && token) h['Authorization'] = `Bearer ${token}`;
+      const opts = { method, headers: h };
+      if (body) opts.body = JSON.stringify(body);
+      try {
+        const r = await fetch(API + path, opts);
+        const d = await r.json().catch(() => ({}));
+        return { ok: r.ok, status: r.status, data: d };
+      } catch (e) {
+        return { ok: false, status: 0, data: { message: 'Network error — is the server running?' } };
+      }
+    }
+
+    /* ════════════════════════════════════════
+       AUTH
+    ════════════════════════════════════════ */
+    function switchTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+      hideAlert('auth');
+    }
+
+    async function login() {
+      const email = v('li-email'), password = v('li-pass');
+      if (!email || !password) return showAlert('auth', 'Please fill all fields', 'e');
+      setTxt('li-txt', '⏳ Logging in...');
+      const { ok, data } = await api('POST', '/auth/login/', { email, password }, false);
+      setTxt('li-txt', 'Login');
+      if (!ok) return showAlert('auth', data.detail || 'Invalid credentials', 'e');
+      saveAuth(data.access, data.refresh, { email, username: data.username || email.split('@')[0] });
+      toast('Welcome back! 👋', 'ts');
+      boot();
+    }
+
+    async function register() {
+      const username = v('rg-user'), email = v('rg-email'), password = v('rg-pass'), password2 = v('rg-pass2');
+      if (!username || !email || !password || !password2) return showAlert('auth', 'Please fill all fields', 'e');
+      if (password !== password2) return showAlert('auth', 'Passwords do not match', 'e');
+      setTxt('rg-txt', '⏳ Creating...');
+      const { ok, data } = await api('POST', '/auth/register/', { username, email, password, password2 }, false);
+      setTxt('rg-txt', 'Create Account');
+      if (!ok) {
+        const msg = Object.values(data).flat()[0] || 'Registration failed';
+        return showAlert('auth', msg, 'e');
+      }
+      saveAuth(data.tokens.access, data.tokens.refresh, data.user);
+      toast('Account created! 🎉', 'ts');
+      boot();
+    }
+
+    function saveAuth(acc, ref, user) {
+      token = acc; refreshTok = ref; me = user;
+      localStorage.setItem('qai_tok', acc);
+      localStorage.setItem('qai_ref', ref);
+      localStorage.setItem('qai_me', JSON.stringify(user));
+    }
+
+    function logout() {
+      api('POST', '/auth/logout/', { refresh: refreshTok });
+      token = ''; refreshTok = ''; me = null;
+      localStorage.clear(); stopTimer();
+      document.getElementById('nav').style.display = 'none';
+      go('auth');
+    }
+
+    /* ════════════════════════════════════════
+       BOOT
+    ════════════════════════════════════════ */
+    function boot() {
+      if (!token) { go('auth'); return; }
+      document.getElementById('nav').style.display = 'flex';
+      document.getElementById('nav-user').textContent = '👤 ' + (me?.username || me?.email || 'User');
+      go('home');
+      loadCats(); loadQuizzes();
+    }
+
+    /* ════════════════════════════════════════
+       HOME — CATEGORIES
+    ════════════════════════════════════════ */
+    async function loadCats() {
+      const { ok, data } = await api('GET', '/quizzes/categories/');
+      if (!ok) return;
+      const cats = data.data || [];
+      const g = document.getElementById('cat-grid');
+      g.innerHTML = cats.length ? cats.map(c => `
+    <div class="ccard" onclick="filterCat('${c.key}',this)" data-cat="${c.key}">
+      <div class="cicon">${CAT_ICON[c.key] || '📁'}</div>
+      <div class="cname">${c.name}</div>
+      <div class="ccount">${c.quiz_count} quiz${c.quiz_count !== 1 ? 'es' : ''}</div>
+    </div>`).join('') : '';
+    }
+
+    function filterCat(key, el) {
+      document.querySelectorAll('.ccard').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('browse-title').textContent = (CAT_ICON[key] || '') + ' ' + (CAT_NAME[key] || key) + ' Quizzes';
+      loadQuizzes(key);
+    }
+
+    function resetFilter() {
+      document.querySelectorAll('.ccard').forEach(c => c.classList.remove('active'));
+      document.getElementById('browse-title').textContent = 'All Quizzes';
+      loadQuizzes();
+    }
+
+    /* ════════════════════════════════════════
+       HOME — QUIZ LIST
+    ════════════════════════════════════════ */
+    async function loadQuizzes(cat = null) {
+      const g = document.getElementById('quiz-grid');
+      g.innerHTML = '<div class="ldwrap"><div class="spin"></div><p style="color:var(--text2)">Loading...</p></div>';
+      const url = cat ? `/quizzes/?category=${cat}` : '/quizzes/';
+      const { ok, data } = await api('GET', url);
+      if (!ok) { g.innerHTML = '<div class="empty"><div class="eico">❌</div><h3>Could not load quizzes</h3></div>'; return; }
+      const qs = data.results || data;
+      if (!qs.length) {
+        g.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="eico">📭</div><h3>No quizzes yet</h3><p>Generate your first AI quiz!</p><br><button class="btn btn-p" onclick="openGen()" style="margin-top:.8rem">🤖 Generate</button></div>`;
+        return;
+      }
+      g.innerHTML = qs.map(q => `
+    <div class="qcard" onclick="startQuiz(${q.id})">
+      <div class="qch">
+        <h3>${q.title}</h3>
+        <div class="qbdgs">
+          <span class="bdg b${q.difficulty[0]}">${q.difficulty}</span>
+          ${q.is_ai_generated ? '<span class="bdg ba">AI</span>' : ''}
+        </div>
+      </div>
+      <p class="qdesc">${q.description || q.topic}</p>
+      <div class="qmeta">
+        <span>${CAT_ICON[q.category] || '📁'} ${CAT_NAME[q.category] || q.category}</span>
+        <span>📝 ${q.question_count} Qs</span>
+        <span>⭐ ${q.total_points || 0}pts</span>
+        <span>⏱️ ${q.time_limit_minutes || 15}min</span>
+        ${q.language && q.language !== 'english' ? `<span>🌐 ${q.language}</span>` : ''}
+      </div>
+    </div>`).join('');
+    }
+
+    /* ════════════════════════════════════════
+       MY QUIZZES
+    ════════════════════════════════════════ */
+    async function loadMyQuizzes() {
+      const c = document.getElementById('mq-list');
+      c.innerHTML = '<div class="ldwrap"><div class="spin"></div></div>';
+      const { ok, data } = await api('GET', '/quizzes/my-quizzes/');
+      if (!ok) { c.innerHTML = '<div class="empty"><div class="eico">❌</div><h3>Could not load</h3></div>'; return; }
+      const qs = data.results || data;
+      if (!qs.length) {
+        c.innerHTML = `<div class="empty"><div class="eico">📭</div><h3>No quizzes attempted yet</h3><p>Take your first quiz from the Home page!</p><br><button class="btn btn-p" onclick="go('home')" style="margin-top:.8rem">Browse Quizzes</button></div>`;
+        return;
+      }
+      // Get best scores
+      const { data: ad } = await api('GET', '/quizzes/my-attempts/?status=completed');
+      const atts = ad.results || ad || [];
+      const bmap = {};
+      atts.forEach(a => { if (!bmap[a.quiz] || a.percentage > bmap[a.quiz].percentage) bmap[a.quiz] = a; });
+
+      c.innerHTML = qs.map(q => {
+        const b = bmap[q.id];
+        const pct = b ? b.percentage : null;
+        const col = pct === null ? 'var(--text2)' : pct >= 60 ? 'var(--easy)' : 'var(--accent2)';
+        return `<div class="mqitem" onclick="startQuiz(${q.id})">
+      <div class="mqinfo">
+        <div class="mqtitle">${q.title}</div>
+        <div class="mqmeta">
+          <span>${CAT_ICON[q.category] || '📁'} ${CAT_NAME[q.category] || q.category}</span>
+          <span class="bdg b${q.difficulty[0]}">${q.difficulty}</span>
+          <span>📝 ${q.question_count} Qs</span>
+          <span>⭐ ${q.total_points || 0}pts</span>
+        </div>
+      </div>
+      <div class="mqscore">
+        <div class="mqpct" style="color:${col}">${pct !== null ? pct.toFixed(1) + '%' : '—'}</div>
+        <div style="font-size:.7rem;color:var(--text2)">${b ? (b.passed ? '✅ Passed' : '❌ Failed') : 'Not completed'}</div>
+        <div style="font-size:.7rem;color:var(--accent);margin-top:.25rem">↩ Retake</div>
+      </div>
+    </div>`;
+      }).join('');
+    }
+
+    /* ════════════════════════════════════════
+       QUIZ TAKING
+    ════════════════════════════════════════ */
+    async function startQuiz(quizId) {
+      const { ok: qok, data: quiz } = await api('GET', `/quizzes/${quizId}/`);
+      if (!qok) { toast('Could not load quiz', 'te'); return; }
+      cQuiz = quiz; cQs = quiz.questions || [];
+      if (!cQs.length) { toast('Quiz has no questions', 'te'); return; }
+
+      const { ok, data } = await api('POST', `/quizzes/${quizId}/attempt/`);
+      if (!ok) { toast('Could not start attempt', 'te'); return; }
+      cAttemptId = data.data.attempt_id;
+      cIdx = 0; selOpt = null;
+      totalSec = data.data.time_limit_seconds || quiz.time_limit_seconds || 900;
+      timerSec = totalSec;
+
+      document.getElementById('t-title').textContent = quiz.title;
+      document.getElementById('t-info').innerHTML = `<div>${quiz.difficulty.toUpperCase()}</div><div>${cQs[0]?.points || 1}pt/question</div>`;
+
+      go('quiz');
+      renderQ();
+      startTimer();
+    }
+
+    function renderQ() {
+      const q = cQs[cIdx], tot = cQs.length;
+      document.getElementById('q-prog-txt').textContent = `Q ${cIdx + 1}/${tot}`;
+      document.getElementById('q-topic').textContent = cQuiz.topic;
+      document.getElementById('q-pfill').style.width = (cIdx / tot * 100) + '%';
+      document.getElementById('q-num').textContent = `Question ${cIdx + 1}`;
+      document.getElementById('q-pts').textContent = `${q.points || 1} pt${(q.points || 1) > 1 ? 's' : ''}`;
+      const db = document.getElementById('q-diff');
+      db.textContent = cQuiz.difficulty;
+      db.className = `bdg b${cQuiz.difficulty[0]}`;
+      document.getElementById('q-txt').textContent = q.question_text;
+      const ltrs = ['A', 'B', 'C', 'D', 'E'];
+      document.getElementById('q-opts').innerHTML = q.options.map((o, i) => `
+    <div class="oi" onclick="pickOpt(${o.id},this)" data-id="${o.id}">
+      <span class="oltr">${ltrs[i]}</span>${o.option_text}
+    </div>`).join('');
+      selOpt = null;
+      const nb = document.getElementById('q-next');
+      nb.disabled = true;
+      nb.textContent = cIdx === tot - 1 ? '✅ Finish Quiz' : 'Next →';
+    }
+
+    async function pickOpt(optId, el) {
+      document.querySelectorAll('.oi').forEach(o => o.classList.remove('sel'));
+      el.classList.add('sel');
+      selOpt = optId;
+      document.getElementById('q-next').disabled = false;
+      await api('POST', `/quizzes/attempts/${cAttemptId}/answer/`, {
+        question_id: cQs[cIdx].id,
+        selected_option_id: optId
+      });
+    }
+
+    async function nextQ() {
+      if (!selOpt) return;
+      cIdx++;
+      if (cIdx < cQs.length) renderQ();
+      else await finishQuiz(false);
+    }
+
+    async function finishQuiz(timeout = false) {
+      stopTimer();
+      const url = timeout ? `/quizzes/attempts/${cAttemptId}/timeout/` : `/quizzes/attempts/${cAttemptId}/complete/`;
+      const { ok, data } = await api('POST', url);
+      if (!ok) { toast('Error completing quiz', 'te'); return; }
+      showResults(data.data, timeout);
+    }
+
+    /* ════════════════════════════════════════
+       TIMER
+    ════════════════════════════════════════ */
+    function startTimer() {
+      stopTimer();
+      updateTimer();
+      timerInt = setInterval(() => {
+        timerSec--;
+        updateTimer();
+        if (timerSec <= 0) { stopTimer(); finishQuiz(true); }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInt) { clearInterval(timerInt); timerInt = null; }
+    }
+
+    function updateTimer() {
+      const m = Math.floor(timerSec / 60), s = timerSec % 60;
+      const d = document.getElementById('t-disp'), f = document.getElementById('t-fill');
+      if (!d) return;
+      d.textContent = `${m}:${String(s).padStart(2, '0')}`;
+      const pct = (timerSec / totalSec) * 100;
+      f.style.width = pct + '%';
+      if (timerSec <= 60) { d.className = 'tdisp urg'; f.className = 'tfill urg'; }
+      else if (pct <= 30) { d.className = 'tdisp warn'; f.className = 'tfill warn'; }
+      else { d.className = 'tdisp'; f.className = 'tfill'; }
+    }
+
+    /* ════════════════════════════════════════
+       RESULTS
+    ════════════════════════════════════════ */
+    function showResults(res, timedOut = false) {
+      const pct = Math.round(res.percentage || 0), passed = res.passed;
+      const answers = res.answers || [];
+      const ok = answers.filter(a => a.is_correct).length, no = answers.length - ok;
+
+      // Banner
+      const bn = document.getElementById('res-banner');
+      if (timedOut) {
+        bn.className = 'rbanner tout';
+        document.getElementById('res-title').textContent = '⏰ Time Out!';
+        document.getElementById('res-sub').textContent = `Scored ${pct}% before time ran out`;
+      } else if (passed) {
+        bn.className = 'rbanner pass';
+        document.getElementById('res-title').textContent = '🎉 You Passed!';
+        document.getElementById('res-sub').textContent = `Excellent! Scored ${pct}%`;
+      } else {
+        bn.className = 'rbanner fail';
+        document.getElementById('res-title').textContent = '😔 Try Again';
+        document.getElementById('res-sub').textContent = `Scored ${pct}%. Need 60% to pass.`;
+      }
+
+      // Arc
+      const arc = document.getElementById('s-arc');
+      arc.style.stroke = passed ? 'var(--easy)' : timedOut ? 'var(--medium)' : 'var(--accent2)';
+      setTimeout(() => arc.style.strokeDashoffset = 345 - (pct / 100) * 345, 100);
+      document.getElementById('s-pct').textContent = pct + '%';
+      document.getElementById('s-pts').textContent = (res.score || 0) + ' pts';
+
+      // Stats
+      document.getElementById('rs-ok').textContent = ok;
+      document.getElementById('rs-no').textContent = no;
+      const t = res.time_taken_seconds;
+      document.getElementById('rs-time').textContent = t ? `${Math.floor(t / 60)}m${t % 60}s` : '—';
+
+      // Badges
+      const bdgs = [];
+      if (pct === 100) bdgs.push('<span class="bdg ba">🌟 Perfect!</span>');
+      if (pct >= 80 && pct < 100) bdgs.push('<span class="bdg be">🔥 High Score</span>');
+      if (passed) bdgs.push('<span class="bdg be">✅ Passed</span>');
+      if (cQuiz?.difficulty === 'hard' && passed) bdgs.push('<span class="bdg bh">💪 Hard Mode!</span>');
+      document.getElementById('res-bdgs').innerHTML = bdgs.join('');
+
+      // Answers
+      document.getElementById('res-answers').innerHTML = answers.map(a => `
+    <div class="aitm">
+      <div class="aqtxt">${a.question_text}</div>
+      <div class="arow">
+        <span class="atag ${a.is_correct ? 'aok' : 'ano'}">${a.is_correct ? '✓ Correct' : '✗ Wrong'}</span>
+        ${!a.is_correct ? `<span style="color:var(--text2)">Correct: ${a.correct_option?.option_text || 'N/A'}</span>` : ''}
+        <span style="color:var(--accent);font-size:.72rem">+${a.points_earned || 0}pts</span>
+      </div>
+      ${a.explanation ? `<div class="aexp">💡 ${a.explanation}</div>` : ''}
+    </div>`).join('');
+
+      go('results');
+    }
+
+    /* ════════════════════════════════════════
+       LEADERBOARD
+    ════════════════════════════════════════ */
+    async function loadLB(cat = null, tabEl = null) {
+      if (tabEl) { document.querySelectorAll('#lb-tabs .tb').forEach(t => t.classList.remove('active')); tabEl.classList.add('active'); }
+      const { ok, data } = await api('GET', cat ? `/analytics/leaderboard/?category=${cat}` : '/analytics/leaderboard/');
+      if (!ok) return;
+
+      // Build category tabs (only once)
+      const tabs = document.getElementById('lb-tabs');
+      if (!tabs.querySelector('[data-cat]')) {
+        (data.categories || []).forEach(c => {
+          const b = document.createElement('button');
+          b.className = 'tb'; b.dataset.cat = c.key;
+          b.innerHTML = `${CAT_ICON[c.key] || '📁'} ${c.name}`;
+          b.onclick = () => loadLB(c.key, b);
+          tabs.appendChild(b);
+        });
+      }
+
+      const rows = data.data || [];
+      document.getElementById('lb-tbody').innerHTML = !rows.length ?
+        `<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:2rem">No data yet — take some quizzes!</td></tr>` :
+        rows.map(r => `<tr>
+      <td><span class="lbr ${r.rank === 1 ? 'gold' : r.rank === 2 ? 'silver' : r.rank === 3 ? 'bronze' : ''}">${r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : '#' + r.rank}</span></td>
+      <td style="font-weight:500">${r.username}</td>
+      <td><span style="color:var(--easy);font-weight:700">${r.best_score}%</span></td>
+      <td>${r.average_score}%</td>
+      <td>${r.attempts}</td>
+      <td style="color:var(--easy)">${r.passed}</td>
+    </tr>`).join('');
+    }
+
+    /* ════════════════════════════════════════
+       DASHBOARD
+    ════════════════════════════════════════ */
+    async function loadDash() {
+      const { ok, data } = await api('GET', '/analytics/dashboard/');
+      if (!ok) return;
+      const s = data.data?.summary || {};
+      document.getElementById('ds-tot').textContent = s.total_attempts ?? '0';
+      document.getElementById('ds-com').textContent = s.completed ?? '0';
+      document.getElementById('ds-pas').textContent = s.passed ?? '0';
+      document.getElementById('ds-fai').textContent = s.failed ?? '0';
+      document.getElementById('ds-avg').textContent = (s.average_score ?? 0).toFixed(1) + '%';
+      document.getElementById('ds-bst').textContent = (s.best_score ?? 0).toFixed(1) + '%';
+
+      // Category breakdown
+      const cats = data.data?.category_breakdown || [];
+      document.getElementById('cat-breakdown').innerHTML = cats.length ? cats.map(c => `
+    <div class="dcard">
+      <div class="dlbl">${CAT_ICON[c.category] || '📁'} ${CAT_NAME[c.category] || c.category}</div>
+      <div class="dval pu">${c.average_score.toFixed(1)}%</div>
+      <div style="font-size:.73rem;color:var(--text2);margin-top:.2rem">${c.attempts} attempt${c.attempts !== 1 ? 's' : ''} • ${c.passed} passed</div>
+    </div>`).join('') : `<p style="color:var(--text2);font-size:.85rem">Take some quizzes to see category stats!</p>`;
+
+      // Recent attempts
+      const { data: ad } = await api('GET', '/quizzes/my-attempts/');
+      const atts = ad.results || ad || [];
+      document.getElementById('dash-tbody').innerHTML = !atts.length ?
+        `<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:2rem">No attempts yet</td></tr>` :
+        atts.map(a => `<tr>
+      <td style="font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis">${a.quiz_title || 'Quiz'}</td>
+      <td>${CAT_ICON[a.quiz_category] || '📁'} ${CAT_NAME[a.quiz_category] || a.quiz_category || '—'}</td>
+      <td><span class="bdg b${(a.quiz_difficulty || 'm')[0]}">${a.quiz_difficulty || '—'}</span></td>
+      <td><span style="color:${(a.percentage || 0) >= 60 ? 'var(--easy)' : 'var(--accent2)'};font-weight:600">${a.percentage ? a.percentage.toFixed(1) + '%' : '—'}</span></td>
+      <td><span class="bdg ${a.passed ? 'be' : a.status === 'completed' ? 'bh' : 'bm'}">${a.passed ? 'Passed' : a.status === 'completed' ? 'Failed' : a.status}</span></td>
+      <td style="color:var(--text2)">${new Date(a.started_at).toLocaleDateString()}</td>
+    </tr>`).join('');
+    }
+
+    /* ════════════════════════════════════════
+       GENERATE QUIZ
+    ════════════════════════════════════════ */
+    function openGen() {
+      document.getElementById('gen-modal').classList.add('show');
+      document.getElementById('gen-form').style.display = 'block';
+      document.getElementById('gen-loading').style.display = 'none';
+      document.getElementById('gen-topic').value = '';
+      hideAlert('gen');
+    }
+    function closeGen() { document.getElementById('gen-modal').classList.remove('show'); }
+
+    async function genQuiz() {
+      const topic = v('gen-topic').trim(), num_questions = parseInt(v('gen-count')), difficulty = v('gen-diff'), language = v('gen-lang');
+      if (!topic) return showAlert('gen', 'Please enter a topic', 'e');
+      document.getElementById('gen-form').style.display = 'none';
+      document.getElementById('gen-loading').style.display = 'block';
+      const { ok, data } = await api('POST', '/quizzes/generate/', { topic, num_questions, difficulty, language });
+      if (!ok) {
+        document.getElementById('gen-form').style.display = 'block';
+        document.getElementById('gen-loading').style.display = 'none';
+        return showAlert('gen', data.message || 'Generation failed', 'e');
+      }
+      closeGen();
+      toast(`✅ "${data.data.quiz_title}" created!`, 'ts');
+      loadQuizzes(); loadCats();
+      setTimeout(() => startQuiz(data.data.quiz_id), 700);
+    }
+
+    /* ════════════════════════════════════════
+       EXIT QUIZ
+    ════════════════════════════════════════ */
+    function confirmExit() { document.getElementById('exit-modal').classList.add('show'); }
+    function closeExit() { document.getElementById('exit-modal').classList.remove('show'); }
+    function exitQuiz() { closeExit(); stopTimer(); go('home'); }
+
+    /* ════════════════════════════════════════
+       PAGE NAVIGATION
+    ════════════════════════════════════════ */
+    function go(name) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + name).classList.add('active');
+      ['home', 'myquizzes', 'leaderboard', 'dashboard'].forEach(p => {
+        const b = document.getElementById('nb-' + p);
+        if (b) b.classList.toggle('on', p === name);
+      });
+      window.scrollTo(0, 0);
+      if (name === 'home') { loadCats(); loadQuizzes(); }
+      if (name === 'myquizzes') loadMyQuizzes();
+      if (name === 'leaderboard') loadLB();
+      if (name === 'dashboard') loadDash();
+      if (name !== 'quiz') stopTimer();
+    }
+
+    /* ════════════════════════════════════════
+       UI HELPERS
+    ════════════════════════════════════════ */
+    function v(id) { return document.getElementById(id)?.value || ''; }
+    function setTxt(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
+    function showAlert(id, msg, type) { const e = document.getElementById(`alert-${id}`); e.className = `alert a${type} show`; e.textContent = msg; }
+    function hideAlert(id) { const e = document.getElementById(`alert-${id}`); if (e) e.classList.remove('show'); }
+    function toast(msg, type = 'ts') { const t = document.getElementById('toast'); t.textContent = msg; t.className = `toast ${type} show`; setTimeout(() => t.classList.remove('show'), 3200); }
+
+    // Close modals on outside click
+    ['gen-modal', 'exit-modal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', e => {
+        if (e.target === document.getElementById(id)) {
+          if (id === 'gen-modal') closeGen();
+          else closeExit();
+        }
+      });
+    });
+
+    /* ════════════════════════════════════════
+       BOOT ON LOAD
+    ════════════════════════════════════════ */
+    window.onload = () => { if (token && me) boot(); else go('auth'); };
+  </script>
+</body>
+
+</html>
